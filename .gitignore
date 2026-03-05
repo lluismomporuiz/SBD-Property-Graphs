@@ -1,0 +1,16 @@
+# Raw datasets
+data/raw/*.xml
+data/raw/*.dtd
+data/raw/*.gz
+
+# Large generated data
+data/processed/*.csv
+*.db
+*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Keep folders
+!data/raw/.gitkeep
