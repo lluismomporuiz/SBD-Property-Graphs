@@ -1,16 +1,7 @@
-# Raw datasets
-data/raw/*.xml
-data/raw/*.dtd
-data/raw/*.gz
-
-# Large generated data
-data/processed/*.csv
-*.db
-*.log
-
-# Python
+.venv/
 __pycache__/
-*.pyc
-
-# Keep folders
-!data/raw/.gitkeep
+Input_XML_data/
+Neo4j_import/
+Neo4j/
+output_csv/
+.python-version
