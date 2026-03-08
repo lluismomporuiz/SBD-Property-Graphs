@@ -30,7 +30,7 @@ Relationships:
 
 Usage
 -----
-  python grafo_generator.py
+  python graph_generator.py
 
 Expected input layout:
   output_csv/
@@ -44,7 +44,6 @@ import os
 import re
 import uuid
 import random
-
 import pandas as pd
 
 # =============================================================================
@@ -52,7 +51,7 @@ import pandas as pd
 # =============================================================================
 
 # Only include papers published from this year onwards.
-# 2015 gives a good balance: ~80-100k papers, fast import, enough data for all
+# 2015 gives a good balance: hundreads of papers, fast import, enough data for all
 # lab queries (B, C, D) to return meaningful results.
 MIN_YEAR = 2015
 
@@ -280,12 +279,10 @@ def build_journal_schema(df_papers: pd.DataFrame):
     """
     Derive Journal and Volume nodes from the journal-article subset.
 
-    Volume deduplication (FIX applied here):
+    Volume deduplication:
       A Volume is defined as the unique combination of (venue, year).
       This mirrors real-world semantics: a journal publishes one or a few
-      volumes per year, not one per paper. The previous implementation
-      assigned a distinct volume_id per paper, producing 100k+ spurious
-      Volume nodes and breaking the semantic meaning of the Volume entity.
+      volumes per year, not one per paper.
 
     Relationships produced:
       (Paper)  -[:PUBLISHED_IN_VOLUME]-> (Volume)
@@ -313,7 +310,7 @@ def build_journal_schema(df_papers: pd.DataFrame):
     acronym_to_jid   = dict(zip(df_nodes_journals['acronym'], df_nodes_journals['journal_id']))
     venue_to_jid     = {v: acronym_to_jid.get(venue_to_acronym.get(v)) for v in df_j['venue'].unique()}
 
-    # ── Volume nodes: ONE per (venue, year) — correct semantic granularity ───
+    # ── Volume nodes: ONE per (venue, year) ───
     df_vol_keys = df_j[['venue', 'year']].drop_duplicates().copy()
     df_vol_keys['volume_id'] = [f"vol_{uuid.uuid4().hex[:8]}" for _ in range(len(df_vol_keys))]
 
@@ -351,12 +348,10 @@ def build_conference_schema(df_papers: pd.DataFrame):
     """
     Derive Conference, Workshop, and Edition nodes from conference papers.
 
-    Edition deduplication (FIX applied here):
+    Edition deduplication:
       An Edition is defined as the unique combination of (venue, year).
       This mirrors real-world semantics: SIGMOD 2019 is ONE edition regardless
-      of how many papers it contains. The previous implementation assigned a
-      distinct edition_id per paper, producing 127k+ spurious Edition nodes
-      and making query B.2 (authors in >= 4 editions) semantically incorrect.
+      of how many papers it contains.
 
     Relationships produced:
       (Paper)   -[:PRESENTED_IN]-> (Edition)
@@ -569,7 +564,7 @@ def build_citation_schema(
     Tier 1 — Real citations:
       DBLP encodes citation keys in the 'cite' field. We retain those that
       resolve to another paper present in our filtered subgraph.
-      NOTE: when filtering to a narrow year window, internal overlap is low,
+      Note: when filtering to a narrow year window, internal overlap is low,
       so real citations may be close to zero — this is expected and correct.
 
     Tier 2 — Synthetic top-up:
@@ -644,8 +639,7 @@ def build_review_schema(
     Design note:
       The review is stored as a rich relationship (Author)-[:REVIEWED]->(Paper)
       rather than a separate Review node. This is the simpler approach and
-      satisfies all lab queries. A Review node variant can be substituted in
-      A.3 if the grader requires a node-based model.
+      satisfies all lab queries.
     """
     paper_to_authors = df_rels_wrote.groupby('paper_id')['author_id'].apply(set).to_dict()
     all_author_ids   = tuple(df_nodes_authors['author_id'].tolist())
