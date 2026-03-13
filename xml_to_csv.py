@@ -7,7 +7,6 @@ import re
 import time
 from datetime import date, datetime
 from typing import Dict, Tuple, Union
-
 from lxml import etree
 
 __author__ = 'Thom Hurks'

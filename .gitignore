@@ -2,6 +2,8 @@
 __pycache__/
 Input_XML_data/
 Neo4j_import/
+Neo4j_update/
 Neo4j/
 output_csv/
 .python-version
+.env
